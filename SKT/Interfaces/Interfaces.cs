@@ -8,6 +8,8 @@ namespace SKT.Interfaces
 {
    public interface IVector : IList<double> { }
 
+   public class MyList : List<double>, IVector;
+
    public interface IParametricFunction<TParameter, TInput, TOutput>
    {
       IFunction<TInput, TOutput> Bind(TParameter parameters);
@@ -35,14 +37,14 @@ namespace SKT.Interfaces
    {
 
    }
-   public interface ILeastSquaresFunctional<TFunction, TInput, TOutput> : IFunctional<TFunction, TInput, TOutput> where TFunction : IFunction<TInput, TOutput>
+   public interface ILeastSquaresFunctional<TInput, TOutput> : IFunctional<IDifferentiableFunction<TInput, TOutput>, TInput, TOutput>
    {
-      IVector Residual(TFunction function);
-      IMatrix Jacobian(TFunction function);
+      IVector Residual(IDifferentiableFunction<TInput, TOutput> function);
+      IMatrix Jacobian(IDifferentiableFunction<TInput, TOutput> function);
    }
    public interface IOptimizator<TFunctional, TFunction, TParameter, TInput, TOutput> where TFunctional : IFunctional<TFunction, TInput, TOutput> where TFunction : IFunction<TInput, TOutput>
    {
-      IVector Minimize(TFunctional objective, IParametricFunction<TParameter, TInput, TOutput> function, TParameter initialParameters, IVector minimumParameters = default, IVector maximumParameters = default);
+      TParameter Minimize(TFunctional objective, IParametricFunction<TParameter, TInput, TOutput> function, TParameter initialParameters, IVector minimumParameters = default, IVector maximumParameters = default);
    }
-   
+
 }
