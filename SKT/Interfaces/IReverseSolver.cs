@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 
 namespace SKT.Interfaces
 {
-   public interface IReverseSolver : IOptimizator<ILeastSquaresFunctional<IFunction<Vector, Vector>, Vector, Vector>, IFunction<Vector, Vector>, List<Material>, Vector, Vector>
+   public interface IReverseSolver : IOptimizator<ILeastSquaresFunctional<Vector, Vector>, IDifferentiableFunction<Vector, Vector>, List<Material>, Vector, Vector>
    {
 
    }
    public class ReverseSolver : IReverseSolver
    {
+      /// <summary>
+      /// Точки измерений
+      /// </summary>
       public List<(Vector point, Vector B)> Data { get; set; }
       private IDirectSolver _solver;
 
@@ -33,7 +36,7 @@ namespace SKT.Interfaces
 
          public IMatrix Jacobian(IDifferentiableFunction<Vector, Vector> function)
          {
-
+                throw new NotImplementedException();
          }
 
          public IVector Residual(IDifferentiableFunction<Vector, Vector> function)
@@ -48,12 +51,13 @@ namespace SKT.Interfaces
                   result = new MyList();
                   for (int j = 0; j < cur.Count; j++)
                   {
-                     result.Add(cur[]);
+                     //result.Add(cur[]);
 
                   }
                }
 
             }
+            throw new NotImplementedException();
          }
 
          public double Value(IDifferentiableFunction<Vector, Vector> function)
@@ -67,9 +71,11 @@ namespace SKT.Interfaces
          }
       }
 
-      public List<Material> Minimize(ILeastSquaresFunctional<IFunction<Vector, Vector>, Vector, Vector> objective, IParametricFunction<List<Material>, Vector, Vector> function, List<Material> initialParameters, IVector minimumParameters = null, IVector maximumParameters = null)
-      {
-         throw new NotImplementedException();
-      }
-   }
+  
+
+        public List<Material> Minimize(ILeastSquaresFunctional<Vector, Vector> objective, IParametricFunction<List<Material>, Vector, Vector> function, List<Material> initialParameters, IVector minimumParameters = null, IVector maximumParameters = null)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
