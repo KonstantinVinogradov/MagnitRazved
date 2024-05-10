@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SKT.Interfaces
 {
-   public interface IDirectSolver : IParametricFunction<List<Material>, Vector, Vector>
+   public interface IDirectSolver : IParametricFunction<List<Material>, Vector3D, Vector3D>
    {
 
    }
@@ -19,12 +19,12 @@ namespace SKT.Interfaces
          _mesh = mesh;
       }
 
-      public IFunction<Vector, Vector> Bind(List<Material> parameters)
+      public IFunction<Vector3D, Vector3D> Bind(List<Material> parameters)
       {
          return new Sollution(_mesh, parameters);
       }
 
-      private class Sollution : IFunction<Vector, Vector>
+      private class Sollution : IFunction<Vector3D, Vector3D>
       {
          private readonly IMesh _mesh;
          private readonly List<Material> _parameters;
@@ -35,14 +35,14 @@ namespace SKT.Interfaces
             _parameters = parameters;
          }
 
-         public Vector Value(Vector point)
+         public Vector3D Value(Vector3D point)
          {
-            Vector result = Vector.Zero;
+            Vector3D result = Vector3D.Zero;
             foreach (var elem in _mesh.Elements)
             {
                var P = _parameters[elem.MaterialNumber].P;
                double I = _parameters[elem.MaterialNumber].I;
-               Vector r = point - _mesh.GetElementCenter(elem);
+               Vector3D r = point - _mesh.GetElementCenter(elem);
                double rnorm = r.Norm;
                double Bx = I * _mesh.GetElementMeasure(elem) / (4 * Math.PI * rnorm * rnorm * rnorm) *
                   (P.X * (3 * r.X * r.X / rnorm / rnorm - 1) +
@@ -56,7 +56,7 @@ namespace SKT.Interfaces
                   (P.X * (3 * r.Z * r.X / rnorm / rnorm) +
                   P.Y * (3 * r.Z * r.Y / rnorm / rnorm) +
                   P.Z * (3 * r.Z * r.Z / rnorm / rnorm-1));
-               result += new Vector(Bx, By, Bz);
+               result += new Vector3D(Bx, By, Bz);
             }
             return result;
          }

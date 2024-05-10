@@ -9,8 +9,8 @@ namespace SKT.Interfaces
     public interface IMesh
     {
         IEnumerable<Element> Elements { get; }
-        IList<Vector> Points { get; }
-        Vector GetElementCenter(Element elem);
+        IList<Vector3D> Points { get; }
+        Vector3D GetElementCenter(Element elem);
         double GetElementMeasure(Element elem);
 
     }
@@ -27,14 +27,14 @@ namespace SKT.Interfaces
     public class Material
     {
         public double I { get; set; }
-        public Vector P { get; set; }
+        public Vector3D P { get; set; }
     }
     public class MeshBuilder
     {
         /// <summary>
         /// Тут точки должны быть в определенном порядке
         /// </summary>
-        public IList<Vector> PointsBase { get; } = new List<Vector>();
+        public IList<Vector3D> PointsBase { get; } = new List<Vector3D>();
         /// <summary>
         /// Количество узлов
         /// </summary>
