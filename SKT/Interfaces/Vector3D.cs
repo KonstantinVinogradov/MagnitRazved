@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SKT.Interfaces
 {
-   public struct Vector3D
+   public class Vector3D
    {
       public Vector3D(double x, double y, double z)
       {

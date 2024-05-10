@@ -9,9 +9,10 @@ namespace SKT.Interfaces
     public interface IMesh
     {
         IEnumerable<Element> Elements { get; }
-        IList<Vector3D> Points { get; }
+        IReadOnlyList<Vector3D> Points { get; }
         Vector3D GetElementCenter(Element elem);
         double GetElementMeasure(Element elem);
+        bool IsPointInsideElement(Element elem,Vector3D point);
 
     }
     public class Element
@@ -26,6 +27,18 @@ namespace SKT.Interfaces
     }
     public class Material
     {
+        public Material(double i, Vector3D p)
+        {
+            I = i;
+            P = p;
+        }
+
+        public Material()
+        {
+            I = 0;
+            P = new Vector3D(0, 0, 0);
+        }
+
         public double I { get; set; }
         public Vector3D P { get; set; }
     }
