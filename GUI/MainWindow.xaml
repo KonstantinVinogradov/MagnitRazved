@@ -1,0 +1,26 @@
+﻿<Window x:Class="GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GUI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+   <DockPanel VerticalAlignment="Top">
+      <Ribbon VerticalAlignment="Top" DockPanel.Dock="Top" Height="80">
+         <Label Content="H"/>
+         <Ribbon.ApplicationMenu>
+            <RibbonApplicationMenu>
+               <!-- Content  -->
+               <RibbonApplicationMenuItem Header="Open" KeyTip="O"/>
+               <RibbonApplicationMenuItem Header="Save" KeyTip="S"/>
+               <RibbonApplicationMenuItem Header="Load" KeyTip="S"/>
+            </RibbonApplicationMenu>
+         </Ribbon.ApplicationMenu>
+      </Ribbon>
+      <Grid>
+         <Border BorderBrush="Black" BorderThickness="1"/>
+         <Border BorderBrush="Black" BorderThickness="1"/>
+      </Grid>
+   </DockPanel>
+</Window>
