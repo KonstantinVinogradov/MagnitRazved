@@ -72,7 +72,7 @@ namespace SKT.Interfaces
     public interface IDifferentiableFunction<TInput, TOutput> : IFunction<TInput, TOutput>
     {
         // По параметрам исходной IParametricFunction
-        IVector Gradient(TInput point);
+        IVector Gradient(TInput point,int i);
     }
     public interface IFunctional<TFunction, TInput, TOutput> where TFunction : IFunction<TInput, TOutput>
     {
@@ -138,7 +138,7 @@ namespace SKT.Interfaces
 
         public IVector SolveSLAE(IVector rightPart)
         {
-            var slae = new SLAE(this, rightPart as Vector,1e-15);
+            var slae = new SLAE(this, rightPart as Vector,1e-128);
             return slae.LOS().solution;
         }
 

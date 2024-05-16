@@ -13,6 +13,58 @@ namespace SKT.Interfaces
     {
 
     }
+
+    public class LeastSquaresFunctional : ILeastSquaresFunctional<Vector3D, Vector3D>
+    {
+        private readonly List<(Vector3D point, Vector3D B)> Data;
+        private readonly int _parametersCount;
+
+        public LeastSquaresFunctional(List<(Vector3D point, Vector3D B)> data, int parametersCount)
+        {
+            Data = data;
+            _parametersCount = parametersCount;
+        }
+
+        public IMatrix Jacobian(IDifferentiableFunction<Vector3D, Vector3D> function)
+        {
+            var matrix = new Matrix(Data.Count * 3, _parametersCount);
+            for (int i = 0; i < Data.Count; i++)
+            {
+
+                for (int k = 0; k < 3; k++)
+                {
+                    var curgrad = function.Gradient(Data[i].point,k);
+                    Parallel.For(0, _parametersCount, j =>
+                    {
+                        matrix[3 * i + k][j] += curgrad[j];
+                    }
+                    );
+                }
+
+            }
+            return matrix;
+        }
+
+        public IVector Residual(IDifferentiableFunction<Vector3D, Vector3D> function)
+        {
+            IVector result = new Vector();
+            for (int i = 0; i < Data.Count; i++)
+            {
+                (Vector3D point, Vector3D B) data = Data[i];
+                var f = function.Value(data.point);
+                result.Add(data.B.X - f.X);
+                result.Add(data.B.Y - f.Y);
+                result.Add(data.B.Z - f.Z);
+            }
+            return result;
+        }
+
+        public double Value(IDifferentiableFunction<Vector3D, Vector3D> function)
+        {
+            var residual = Residual(function);
+            return residual.Sum(t => t * t);
+        }
+    }
     public class ReverseSolver : IReverseSolver
     {
         /// <summary>
@@ -29,75 +81,101 @@ namespace SKT.Interfaces
             _solver = new DirectSolver(mesh);
         }
 
-
-        private class LeasTSquaresFunctional : ILeastSquaresFunctional<Vector3D, Vector3D>
+        public static double Goldenratio(Func<double, double> func, double a, double b, double eps)
         {
-            private readonly List<(Vector3D point, Vector3D B)> Data;
-            private readonly int _parametersCount;
-
-            public LeasTSquaresFunctional(List<(Vector3D point, Vector3D B)> data, int parametersCount)
+            double k1 = (3 - Math.Sqrt(5)) / 2;
+            double k2 = (Math.Sqrt(5) - 1) / 2;
+            bool flag = true;
+            double x1 = 0, x2 = 0;
+            int i = 1;
+            int lastchosen = 0;
+            int k = 0;
+            while (flag)
             {
-                Data = data;
-                _parametersCount = parametersCount;
-            }
-
-            public IMatrix Jacobian(IDifferentiableFunction<Vector3D, Vector3D> function)
-            {
-                var matrix = new Matrix(Data.Count, _parametersCount);
-                for (int i = 0; i < Data.Count; i++)
+                if (i == 1)
                 {
-                    var curgrad = function.Gradient(Data[i].point);
-                    for (int j = 0; j < _parametersCount; j++)
-                        matrix[i][j] += curgrad[j];
+                    x1 = a + k1 * (b - a);
+                    x2 = a + k2 * (b - a);
                 }
-                return matrix;
-            }
-
-            public IVector Residual(IDifferentiableFunction<Vector3D, Vector3D> function)
-            {
-
-                IVector result = new Vector();
-                for (int i = 0; i < Data.Count; i++)
+                else
                 {
-                    (Vector3D point, Vector3D B) data = Data[i];
-                    for (int j = 0; j < Data.Count; j++)
+                    if (lastchosen == 1)
                     {
-                        result.Add((function.Value(data.point) - data.B).Norm);
+                        x1 = x2;
+                        x2 = a + k2 * (b - a);
+                    }
+                    else
+                    {
+                        x2 = x1;
+                        x1 = a + k1 * (b - a);
                     }
                 }
-                return result;
-            }
-
-            public double Value(IDifferentiableFunction<Vector3D, Vector3D> function)
-            {
-                double res = 0;
-                foreach (var point in Data)
+                double f1 = func(x1);
+                double f2 = func(x2);
+                if (b - a < eps)
                 {
-                    res += (function.Value(point.point) - point.B).Norm;
+                    flag = false;
                 }
-                return res;
+                else
+                {
+                    if (Math.Abs((f1 - f2) / f1) < 1e-15)
+                    {
+                        a = x1;
+                        b = x2;
+                    }
+                    else
+                    {
+                        i++;
+                        if (f1 < f2)
+                        {
+                            b = x2;
+                            lastchosen = 2;
+                        }
+                        else
+                        {
+                            a = x1;
+                            lastchosen = 1;
+                        }
+                    }
+                }
             }
+            return (x1 + x2) / 2;
         }
+
+
 
         private const int Maxiter = 150;
         public List<Material> Minimize(ILeastSquaresFunctional<Vector3D, Vector3D> objective, IParametricFunction<IDifferentiableFunction<Vector3D, Vector3D>, List<Material>, Vector3D, Vector3D> function, List<Material> initialParameters, IVector minimumParameters = null, IVector maximumParameters = null)
         {
             int k = 0;
             var f = _solver.Bind(initialParameters);
-            while (objective.Value(f) > 1e-15 && k < Maxiter)
+            var value = objective.Value(f);
+            Console.WriteLine($"{initialParameters[108].P.X} {initialParameters[108].P.Y} {initialParameters[108].P.Z}");
+            Console.WriteLine($"{initialParameters[0].P.X} {initialParameters[0].P.Y} {initialParameters[0].P.Z}");
+            Console.WriteLine($"iteration {k}, value {value}");
+            while (value > 1e-12 && k < Maxiter)
             {
-                var mat = objective.Jacobian(f);
-                var b = objective.Residual(f);
+                var Jacobi = objective.Jacobian(f) as Matrix;
+                var mat = Jacobi.Transpose() * Jacobi;
+                var residual = objective.Residual(f);
+                var b = Jacobi.Transpose() * residual;
+                //for (int i = 0; i < mat.Count; i++)
+                //{
+                //    mat[i][i] += 1e-7;
+                //}
                 var dmaterial = mat.SolveSLAE(b);
                 for (int i = 0; i < initialParameters.Count; i++)
                 {
-                    initialParameters[i].I += dmaterial[4 * i];
-
-                    initialParameters[i].P.X += dmaterial[4 * i + 1];
-                    initialParameters[i].P.Y += dmaterial[4 * i + 2];
-                    initialParameters[i].P.Z += dmaterial[4 * i + 3];
+                    initialParameters[i].P.X += dmaterial[3 * i];
+                    initialParameters[i].P.Y += dmaterial[3 * i + 1];
+                    initialParameters[i].P.Z += dmaterial[3 * i + 2];
                 }
                 k++;
+                value = objective.Value(f);
+
+                Console.WriteLine($"{initialParameters[108].P.X} {initialParameters[108].P.Y} {initialParameters[108].P.Z}");
+                Console.WriteLine($"{initialParameters[0].P.X} {initialParameters[0].P.Y} {initialParameters[0].P.Z}");
+                Console.WriteLine($"iteration {k}, value {value}");
             }
             return initialParameters;
         }

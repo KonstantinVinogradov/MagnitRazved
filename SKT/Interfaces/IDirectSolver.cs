@@ -36,40 +36,46 @@ namespace SKT.Interfaces
                 _mesh = mesh;
                 _parameters = parameters;
             }
-
-            public IVector Gradient(Vector3D point)
+            const double diffparameter = 0.0005;
+            public IVector Gradient(Vector3D point,int i)
             {
                 Vector res = [];
                 foreach (Element elem in _mesh.Elements)
                 {
-                    if (_mesh.IsPointInsideElement(elem, point))
-                    {
-                        var value = Value(point);
-                        var curmaterial = _parameters[elem.MaterialNumber];
+                    var value = Value(point);
+                    var curmaterial = _parameters[elem.MaterialNumber];
 
-                        double delta = Math.Abs(curmaterial.I) > 1e-7 ? curmaterial.I * 0.05 : 1e-7;
-                        curmaterial.I += delta;
-                        res.Add((Value(point) - value).Norm / delta);
-                        curmaterial.I -= delta;
+                    var delta = Math.Abs(curmaterial.P.X) > 1e-7 ? curmaterial.P.X * diffparameter : 1e-7;
+                    curmaterial.P.X += delta;
+                    AddToList(res,(Value(point) - value) / delta,i);
+                    curmaterial.P.X -= delta;
 
-                        delta = Math.Abs(curmaterial.P.X) > 1e-7 ? curmaterial.P.X * 0.05 : 1e-7;
-                        curmaterial.P.X += delta;
-                        res.Add((Value(point) - value).Norm / delta);
-                        curmaterial.P.X -= delta;
+                    delta = Math.Abs(curmaterial.P.Y) > 1e-7 ? curmaterial.P.Y * diffparameter : 1e-7;
+                    curmaterial.P.Y += delta;
+                    AddToList(res, (Value(point) - value) / delta,i);
+                    curmaterial.P.Y -= delta;
 
-                        delta = Math.Abs(curmaterial.P.Y) > 1e-7 ? curmaterial.P.Y * 0.05 : 1e-7;
-                        curmaterial.P.Y += delta;
-                        res.Add((Value(point) - value).Norm / delta);
-                        curmaterial.P.Y -= delta;
-
-                        delta = Math.Abs(curmaterial.P.Z) > 1e-7 ? curmaterial.P.Z * 0.05 : 1e-7;
-                        curmaterial.P.Z += delta;
-                        res.Add((Value(point) - value).Norm / delta);
-                        curmaterial.P.Z -= delta;
-                    }
-                    res.AddRange(Enumerable.Repeat(0.0, 4));
+                    delta = Math.Abs(curmaterial.P.Z) > 1e-7 ? curmaterial.P.Z * diffparameter : 1e-7;
+                    curmaterial.P.Z += delta;
+                    AddToList(res, (Value(point) - value) / delta,i);
+                    curmaterial.P.Z -= delta;
                 }
                 return res;
+            }
+            private void AddToList(Vector vec, Vector3D value,int i)
+            {
+                switch (i)
+                {
+                    case 0:
+                        vec.Add(value.X);
+                        break;
+                    case 1:
+                        vec.Add(value.Y);
+                        break;
+                    case 2:
+                        vec.Add(value.Z);
+                        break;
+                }
             }
 
             public Vector3D Value(Vector3D point)
@@ -78,18 +84,17 @@ namespace SKT.Interfaces
                 foreach (var elem in _mesh.Elements)
                 {
                     var P = _parameters[elem.MaterialNumber].P;
-                    double I = _parameters[elem.MaterialNumber].I;
                     Vector3D r = point - _mesh.GetElementCenter(elem);
                     double rnorm = r.Norm;
-                    double Bx = I * _mesh.GetElementMeasure(elem) / (4 * Math.PI * rnorm * rnorm * rnorm) *
+                    double Bx =  _mesh.GetElementMeasure(elem) / (4 * Math.PI * rnorm * rnorm * rnorm) *
                        (P.X * (3 * r.X * r.X / rnorm / rnorm - 1) +
                        P.Y * (3 * r.X * r.Y / rnorm / rnorm) +
                        P.Z * (3 * r.X * r.Z / rnorm / rnorm));
-                    double By = I * _mesh.GetElementMeasure(elem) / (4 * Math.PI * rnorm * rnorm * rnorm) *
+                    double By =  _mesh.GetElementMeasure(elem) / (4 * Math.PI * rnorm * rnorm * rnorm) *
                        (P.X * (3 * r.Y * r.X / rnorm / rnorm) +
                        P.Y * (3 * r.Y * r.Y / rnorm / rnorm - 1) +
                        P.Z * (3 * r.Y * r.Z / rnorm / rnorm));
-                    double Bz = I * _mesh.GetElementMeasure(elem) / (4 * Math.PI * rnorm * rnorm * rnorm) *
+                    double Bz =  _mesh.GetElementMeasure(elem) / (4 * Math.PI * rnorm * rnorm * rnorm) *
                        (P.X * (3 * r.Z * r.X / rnorm / rnorm) +
                        P.Y * (3 * r.Z * r.Y / rnorm / rnorm) +
                        P.Z * (3 * r.Z * r.Z / rnorm / rnorm - 1));
