@@ -59,9 +59,9 @@ namespace SKT.Interfaces
         }
     }
 
-    public interface IParametricFunction<TParameter, TInput, TOutput>
+    public interface IParametricFunction<TFunction,TParameter, TInput, TOutput>where TFunction:IFunction<TInput,TOutput>
     {
-        IFunction<TInput, TOutput> Bind(TParameter parameters);
+        TFunction Bind(TParameter parameters);
     }
 
     public interface IFunction<TInput, TOutput>
@@ -72,7 +72,7 @@ namespace SKT.Interfaces
     public interface IDifferentiableFunction<TInput, TOutput> : IFunction<TInput, TOutput>
     {
         // По параметрам исходной IParametricFunction
-        IVector Gradient(TInput point);
+        IVector Gradient(TInput point,int i);
     }
     public interface IFunctional<TFunction, TInput, TOutput> where TFunction : IFunction<TInput, TOutput>
     {
@@ -84,7 +84,6 @@ namespace SKT.Interfaces
     }
     public interface IMatrix : IList<IList<double>>
     {
-
         public IVector SolveSLAE(IVector rightPart);
     }
     public class Matrix : List<IList<double>>, IMatrix
@@ -95,16 +94,12 @@ namespace SKT.Interfaces
             M = m;
             for (int i = 0; i < n; i++) 
             {
-                this[i]= new List<double>(Enumerable.Repeat(0.0,n));
+                Add( new List<double>(Enumerable.Repeat(0.0,m)));
             }
         }
 
         public int N { get; init; }
         public int M { get; init; }
-        public Vector SolveSLAE(Vector rightPart)
-        {
-            throw new NotImplementedException();
-        }
         public static Vector operator *(Matrix matrix, IVector vector)
         {
             var product = new Vector(matrix.N);
@@ -143,7 +138,8 @@ namespace SKT.Interfaces
 
         public IVector SolveSLAE(IVector rightPart)
         {
-            throw new NotImplementedException();
+            var slae = new SLAE(this, rightPart as Vector,1e-128);
+            return slae.LOS().solution;
         }
 
         public class SLAE
@@ -167,10 +163,10 @@ namespace SKT.Interfaces
                 double alpha, beta;
                 double squareNorm;
                 Vector q = new(N);
-                Vector r = new(N);
-                Vector z = new(N);
-                Vector p = new(N);
-                Vector tmp = new(N);
+                Vector r;
+                Vector z;
+                Vector p;
+                Vector tmp;
 
                 r = this.B - this.A * q;
 
@@ -207,7 +203,7 @@ namespace SKT.Interfaces
     }
     public interface IOptimizator<TFunctional, TFunction, TParameter, TInput, TOutput> where TFunctional : IFunctional<TFunction, TInput, TOutput> where TFunction : IFunction<TInput, TOutput>
     {
-        TParameter Minimize(TFunctional objective, IParametricFunction<TParameter, TInput, TOutput> function, TParameter initialParameters, IVector minimumParameters = default, IVector maximumParameters = default);
+        TParameter Minimize(TFunctional objective, IParametricFunction<IDifferentiableFunction<TInput, TOutput>,TParameter, TInput, TOutput> function, TParameter initialParameters, IVector minimumParameters = default, IVector maximumParameters = default);
     }
 
 }
