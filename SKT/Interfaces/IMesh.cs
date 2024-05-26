@@ -8,6 +8,10 @@ namespace SKT.Interfaces
 {
     public interface IMesh
     {
+        Vector3D this[int index]
+        {
+            get;
+        }
         IEnumerable<Element> Elements { get; }
         IReadOnlyList<Vector3D> Points { get; }
         Vector3D GetElementCenter(Element elem);

@@ -13,6 +13,9 @@ internal class Mesh : IMesh
     private readonly List<Element> _elements;
 
     public IReadOnlyList<Vector3D> Points => _points;
+
+    public Vector3D this[int index] => _points[index];
+
     private readonly List<Vector3D> _points;
 
     public Mesh(List<Element> elements, List<Vector3D> points)

@@ -6,61 +6,167 @@
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-   <DockPanel VerticalAlignment="Top">
-      <Ribbon VerticalAlignment="Top" DockPanel.Dock="Top" Height="80">
-         <Label Content="H"/>
-         <Ribbon.ApplicationMenu>
-            <RibbonApplicationMenu>
-               <!-- Content  -->
-               <RibbonApplicationMenuItem Header="Open" KeyTip="O"/>
-               <RibbonApplicationMenuItem Header="Save" KeyTip="S"/>
-               <RibbonApplicationMenuItem Header="Load" KeyTip="L"/>
-            </RibbonApplicationMenu>
-         </Ribbon.ApplicationMenu>
-      </Ribbon>
-      <Grid>
+    <DockPanel VerticalAlignment="Top">
+        <Ribbon VerticalAlignment="Top" DockPanel.Dock="Top" Height="80">
+            <Ribbon.ApplicationMenu>
+                <RibbonApplicationMenu>
+                    <!-- Content  -->
+                    <RibbonApplicationMenuItem Header="Open" KeyTip="O"/>
+                    <RibbonApplicationMenuItem Header="Save" KeyTip="S"/>
+                    <RibbonApplicationMenuItem Header="Load" KeyTip="L"/>
+                </RibbonApplicationMenu>
+            </Ribbon.ApplicationMenu>
+        </Ribbon>
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2.2*"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <StackPanel Margin="3" Grid.Column="1">
-                <GroupBox Margin="3" Header="Настройки сетки">
-                    <StackPanel Margin="3">
-                        <GroupBox Margin="3" Header="X">
-                            <StackPanel Orientation="Horizontal">
-                                <Grid Margin="3">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Label Grid.Row="0">От</Label>
-                                    <TextBox Grid.Row="1"></TextBox>
-                                </Grid>
+            <ScrollViewer Grid.Column="1">
 
-                                <Grid Margin="3">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Label Grid.Row="0">До</Label>
-                                    <TextBox Grid.Row="1"></TextBox>
-                                </Grid>
-                                <Grid Margin="3">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Label Grid.Row="0">Количество разбиений</Label>
-                                    <TextBox Grid.Row="1"></TextBox>
-                                </Grid>
+                <StackPanel Margin="3" >
+                    <GroupBox Margin="3" Header="Настройки сетки">
+                        <StackPanel Margin="3">
+                            <GroupBox Margin="3" Header="X">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0">От</Label>
+                                        <TextBox Grid.Row="1" x:Name="XFrom"></TextBox>
+                                    </Grid>
 
-                            </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </GroupBox>
-            </StackPanel>
-         <Border BorderBrush="Black" BorderThickness="1"/>
-         <Border BorderBrush="Black" BorderThickness="1"/>
-      </Grid>
-   </DockPanel>
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0">До</Label>
+                                        <TextBox Grid.Row="1" x:Name="XTo"></TextBox>
+                                    </Grid>
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0">Количество разбиений</Label>
+                                        <TextBox Grid.Row="1" x:Name="XCount"></TextBox>
+                                    </Grid>
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox Margin="3" Header="Y">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0">От</Label>
+                                        <TextBox Grid.Row="1" x:Name="YFrom"></TextBox>
+                                    </Grid>
+
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0">До</Label>
+                                        <TextBox Grid.Row="1" x:Name="YTo"></TextBox>
+                                    </Grid>
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0">Количество разбиений</Label>
+                                        <TextBox Grid.Row="1" x:Name="YCount" ></TextBox>
+                                    </Grid>
+
+
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox Margin="3" Header="Z">
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0">От</Label>
+                                        <TextBox Grid.Row="1" x:Name="ZFrom"></TextBox>
+                                    </Grid>
+
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0">До</Label>
+                                        <TextBox Grid.Row="1" x:Name="ZTo"></TextBox>
+                                    </Grid>
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0">Количество разбиений</Label>
+                                        <TextBox Grid.Row="1" x:Name="ZCount"></TextBox>
+                                    </Grid>
+
+                                </StackPanel>
+                            </GroupBox>
+                            <Button Margin="3" Content="Построить сетку" x:Name="BuildMeshButton" Click="BuildMeshButton_Click"/>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="Настройки проекции">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="ProjXYButton" Grid.Column="1" Click="ProjXYButton_Click" Margin="3">XY</Button>
+                                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                    <Label>z =</Label>
+                                    <TextBox MinWidth="40" x:Name="ProjXYTextBox" ></TextBox>
+                                </StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="ProjYZButton" Grid.Column="1" Click="ProjYZButton_Click" Margin="3">YZ</Button>
+
+                                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                    <Label>x =</Label>
+                                    <TextBox MinWidth="40" x:Name="ProjYZTextBox" ></TextBox>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="ProjXZButton" Grid.Column="1" Click="ProjXZButton_Click" Margin="3">XZ</Button>
+
+                                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                    <Label>y =</Label>
+                                    <TextBox MinWidth="40" x:Name="ProjXZTextBox" ></TextBox>
+                                </StackPanel>
+                            </Grid>
+
+                            
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Border BorderBrush="Black" BorderThickness="1"/>
+            <Border BorderBrush="Black" BorderThickness="1"/>
+        </Grid>
+    </DockPanel>
 </Window>
