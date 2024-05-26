@@ -20,11 +20,44 @@
       </Ribbon>
       <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2.2*"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="1">
-                
+            <StackPanel Margin="3" Grid.Column="1">
+                <GroupBox Margin="3" Header="Настройки сетки">
+                    <StackPanel Margin="3">
+                        <GroupBox Margin="3" Header="X">
+                            <StackPanel Orientation="Horizontal">
+                                <Grid Margin="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0">От</Label>
+                                    <TextBox Grid.Row="1"></TextBox>
+                                </Grid>
+
+                                <Grid Margin="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0">До</Label>
+                                    <TextBox Grid.Row="1"></TextBox>
+                                </Grid>
+                                <Grid Margin="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0">Количество разбиений</Label>
+                                    <TextBox Grid.Row="1"></TextBox>
+                                </Grid>
+
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
             </StackPanel>
          <Border BorderBrush="Black" BorderThickness="1"/>
          <Border BorderBrush="Black" BorderThickness="1"/>
