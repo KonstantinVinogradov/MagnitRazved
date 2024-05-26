@@ -32,7 +32,7 @@ namespace GUI
 
                 double x0 = double.Parse(XFrom.Text);
                 double x1 = double.Parse(XTo.Text);
-                int xcount =  int.Parse(XCount.Text);
+                int xcount = int.Parse(XCount.Text);
 
 
                 double y0 = double.Parse(YFrom.Text);
@@ -93,7 +93,7 @@ namespace GUI
             {
                 MessageBox.Show(ex.Message);
             }
-            
+
         }
 
         private void ProjYZButton_Click(object sender, RoutedEventArgs e)
@@ -128,22 +128,34 @@ namespace GUI
             switch (projectionType)
             {
                 case ProjectionTypeEnum.XY:
-                    if(_mesh)
-                    break;
+                    if (_mesh[element.Vernums[0]].Z >= coord &&
+                        _mesh[element.Vernums[^1]].Z <= coord)
+                        return true;
+                        break;
                 case ProjectionTypeEnum.YZ:
+                    if (_mesh[element.Vernums[0]].X >= coord &&
+                        _mesh[element.Vernums[^1]].X <= coord)
+                        return true;
                     break;
                 case ProjectionTypeEnum.XZ:
+                    if (_mesh[element.Vernums[0]].Y >= coord &&
+                        _mesh[element.Vernums[^1]].Y <= coord)
+                        return true;
                     break;
                 default:
                     break;
             }
+            return false;
         }
         private void Draw()
         {
-            if(_mesh==null)
+            if (_mesh == null)
             {
-                MessageBox.Show("Сетка не построена","Ошибка",MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Сетка не построена", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
+            var elements = _mesh.Elements.Where(el => IsElementInProjectionPlane(el));
+
         }
     }
 }
