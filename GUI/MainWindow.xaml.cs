@@ -49,17 +49,17 @@ namespace GUI
 
                 for (int i = 0; i < x.Length; i++)
                 {
-                    x[i] = x0 + (x1 - x0) / xcount;
+                    x[i] = x0 + i * (x1 - x0) / xcount;
                 }
 
                 for (int i = 0; i < y.Length; i++)
                 {
-                    y[i] = y0 + (y1 - y0) / ycount;
+                    y[i] = y0 + i * (y1 - y0) / ycount;
                 }
 
                 for (int i = 0; i < z.Length; i++)
                 {
-                    z[i] = z0 + (z1 - z0) / zcount;
+                    z[i] = z0 + i * (z1 - z0) / zcount;
                 }
                 builder.X = x;
                 builder.Y = y;
@@ -81,12 +81,27 @@ namespace GUI
             XZ
         }
 
+        double minx, maxx, miny, maxy;
+
         private void ProjXYButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_mesh == null)
+            {
+                MessageBox.Show("Сетка не построена", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             try
             {
                 projectionType = ProjectionTypeEnum.XY;
                 coord = double.Parse(ProjXYTextBox.Text);
+                minx = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Min(el => _mesh.Points[el.Vernums[0]].X);
+                maxx = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Max(el => _mesh.Points[el.Vernums[^1]].X);
+                miny = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Min(el => _mesh.Points[el.Vernums[0]].Y);
+                maxy = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Max(el => _mesh.Points[el.Vernums[^1]].Y);
+                if(maxx-minx>maxy-miny)
+                {
+                    maxy = miny + maxx-miny;
+                }
                 Draw();
             }
             catch (Exception ex)
@@ -98,6 +113,11 @@ namespace GUI
 
         private void ProjYZButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_mesh == null)
+            {
+                MessageBox.Show("Сетка не построена", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             try
             {
                 projectionType = ProjectionTypeEnum.YZ;
@@ -112,6 +132,11 @@ namespace GUI
 
         private void ProjXZButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_mesh == null)
+            {
+                MessageBox.Show("Сетка не построена", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             try
             {
                 projectionType = ProjectionTypeEnum.XZ;
@@ -128,24 +153,44 @@ namespace GUI
             switch (projectionType)
             {
                 case ProjectionTypeEnum.XY:
-                    if (_mesh[element.Vernums[0]].Z >= coord &&
-                        _mesh[element.Vernums[^1]].Z <= coord)
+                    if (_mesh[element.Vernums[0]].Z <= coord &&
+                        _mesh[element.Vernums[^1]].Z >= coord)
                         return true;
-                        break;
+                    break;
                 case ProjectionTypeEnum.YZ:
-                    if (_mesh[element.Vernums[0]].X >= coord &&
-                        _mesh[element.Vernums[^1]].X <= coord)
+                    if (_mesh[element.Vernums[0]].X <= coord &&
+                        _mesh[element.Vernums[^1]].X >= coord)
                         return true;
                     break;
                 case ProjectionTypeEnum.XZ:
-                    if (_mesh[element.Vernums[0]].Y >= coord &&
-                        _mesh[element.Vernums[^1]].Y <= coord)
+                    if (_mesh[element.Vernums[0]].Y <= coord &&
+                        _mesh[element.Vernums[^1]].Y >= coord)
                         return true;
                     break;
                 default:
                     break;
             }
             return false;
+        }
+
+        private Path GetLocalRectangle(Element element)
+        {
+            double wcanv = Canvas.ActualWidth;
+            double hcanv = Canvas.ActualHeight;
+            double canvcoef = Math.Min(wcanv, hcanv);
+            RectangleGeometry geometry = new RectangleGeometry();
+            geometry.Rect = new Rect
+                ((_mesh[element.Vernums[0]].X - minx) / (maxx - minx) * canvcoef,
+                (_mesh[element.Vernums[0]].Y - miny) / (maxy - miny) * canvcoef,
+                (_mesh[element.Vernums[^1]].X - _mesh[element.Vernums[0]].X) / (maxx - minx) * canvcoef,
+                (_mesh[element.Vernums[^1]].Y - _mesh[element.Vernums[0]].Y) / (maxy - miny) * canvcoef);
+
+            Path path = new Path();
+            path.Fill = new SolidColorBrush(Colors.Yellow);
+            path.Stroke = new SolidColorBrush(Colors.Red);
+            path.StrokeThickness = 5;
+            path.Data = geometry;
+            return path;
         }
         private void Draw()
         {
@@ -154,7 +199,13 @@ namespace GUI
                 MessageBox.Show("Сетка не построена", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            var elements = _mesh.Elements.Where(el => IsElementInProjectionPlane(el));
+            var elements = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).ToList();
+            Canvas.Children.Clear();
+
+            foreach (var item in elements)
+            {
+                Canvas.Children.Add(GetLocalRectangle(item));
+            }
 
         }
     }
