@@ -14,11 +14,18 @@
                <!-- Content  -->
                <RibbonApplicationMenuItem Header="Open" KeyTip="O"/>
                <RibbonApplicationMenuItem Header="Save" KeyTip="S"/>
-               <RibbonApplicationMenuItem Header="Load" KeyTip="S"/>
+               <RibbonApplicationMenuItem Header="Load" KeyTip="L"/>
             </RibbonApplicationMenu>
          </Ribbon.ApplicationMenu>
       </Ribbon>
       <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="1">
+                
+            </StackPanel>
          <Border BorderBrush="Black" BorderThickness="1"/>
          <Border BorderBrush="Black" BorderThickness="1"/>
       </Grid>
