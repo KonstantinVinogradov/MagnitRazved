@@ -165,6 +165,8 @@
                     <GroupBox Header="Настройки прямой задачи">
                         <StackPanel>
                             <Label>Точки измерений</Label>
+                            <ScrollViewer VirtualizingPanel.IsVirtualizing="True" Height="300">
+                                
                             <DataGrid x:Name="PointsDataGrid" ItemsSource="{Binding Path=Points}" AutoGenerateColumns="False">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="X" Binding="{Binding X}"/>
@@ -172,6 +174,8 @@
                                     <DataGridTextColumn Header="Z" Binding="{Binding Z}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
+                            </ScrollViewer>
+
                             <Button x:Name="CalculateDirect" Click="CalculateDirect_Click">Выполнить расчет</Button>
                             <Button x:Name="SavePointsButton" Click="SavePointsButton_Click">Сохранить точки измерений</Button>
                             <Button x:Name="LoadPointButton" Click="LoadPointButton_Click">Загрузить точки измерений</Button>
