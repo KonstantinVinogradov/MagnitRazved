@@ -4,9 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
-        xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="800" Width="1200">
     <DockPanel VerticalAlignment="Top">
         <Ribbon VerticalAlignment="Top" DockPanel.Dock="Top" Height="80">
             <Ribbon.ApplicationMenu>
@@ -119,6 +118,7 @@
                                 </StackPanel>
                             </GroupBox>
                             <Button Margin="3" Content="Построить сетку" x:Name="BuildMeshButton" Click="BuildMeshButton_Click"/>
+                            <Button Margin="3" Content="Отчистить материалы" x:Name="ClearMaterialsButton" Click="ClearMaterialsButton_Click"/>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Header="Настройки проекции">
@@ -163,9 +163,30 @@
 
                         </StackPanel>
                     </GroupBox>
+                    <GroupBox Header="Настройки прямой задачи">
+                        <StackPanel>
+                            <Label>Точки измерений</Label>
+                            <DataGrid x:Name="PointsDataGrid" ItemsSource="{Binding Path=Points}" AutoGenerateColumns="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="X" Binding="{Binding X}"/>
+                                    <DataGridTextColumn Header="Y" Binding="{Binding Y}"/>
+                                    <DataGridTextColumn Header="Z" Binding="{Binding Z}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Button x:Name="CalculateDirect" Click="CalculateDirect_Click">Выполнить расчет</Button>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="Настройки обратной задачи">
+                        <StackPanel>
+                            <Button Content="Выполнить расчет" Name="CalculateReverse" Click="CalculateReverse_Click"/>
+                        </StackPanel>
+                    </GroupBox>
                 </StackPanel>
             </ScrollViewer>
-            <Canvas x:Name="Canvas" Grid.Column="0" ClipToBounds="True"></Canvas>
+
+            <local:Chart x:Name="Chart" Grid.Column="0">
+            </local:Chart>
+            
             <Border BorderBrush="Black" BorderThickness="1"/>
             <Border BorderBrush="Black" BorderThickness="1"/>
         </Grid>

@@ -1,5 +1,9 @@
-﻿using SKT;
+﻿using Microsoft.Win32;
+using SKT;
 using SKT.Interfaces;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Security.AccessControl;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,10 +23,52 @@ namespace GUI
     public partial class MainWindow : Window
     {
         private IMesh _mesh;
+        private List<Material> _materials = [];
+        public ObservableCollection<Vector3D> Points { get; private set; } = [];
         public MainWindow()
         {
             InitializeComponent();
+            Chart.PointClicked += PointClickedHandler;
+            this.DataContext = this;
         }
+        private void PointClickedHandler(object? sender, PointWrapper e)
+        {
+            Vector3D vector;
+            if (_mesh == null)
+                return;
+            switch (projectionType)
+            {
+                case ProjectionTypeEnum.XY:
+                    vector = new Vector3D(e.X, e.Y, coord);
+                    break;
+                case ProjectionTypeEnum.YZ:
+                    throw new NotImplementedException();
+                case ProjectionTypeEnum.XZ:
+                    throw new NotImplementedException();
+                default:
+                    throw new NotImplementedException();
+            }
+            var elements = _mesh.Elements.Where(t => _mesh.IsPointInsideElement(t, vector)).ToList();
+            Vector3D P = new Vector3D();
+            if (elements.Any())
+            {
+
+                bool result = false;
+                do
+                {
+                    Vector3DRequestWindow window = new Vector3DRequestWindow(ref P);
+                    result = (bool)window.ShowDialog();
+                } while (result);
+            }
+
+            foreach (var item in elements)
+            {
+                _materials[item.MaterialNumber].P = P;
+            }
+            Draw();
+
+        }
+
 
         private void BuildMeshButton_Click(object sender, RoutedEventArgs e)
         {
@@ -64,8 +110,13 @@ namespace GUI
                 builder.X = x;
                 builder.Y = y;
                 builder.Z = z;
-
                 _mesh = builder.Build();
+                foreach (var item in _mesh.Elements)
+                {
+                    _materials.Add(new Material());
+                }
+                Chart.Elements.Clear();
+                Chart.InvalidateVisual();
             }
             catch (Exception ex)
             {
@@ -98,15 +149,94 @@ namespace GUI
                 maxx = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Max(el => _mesh.Points[el.Vernums[^1]].X);
                 miny = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Min(el => _mesh.Points[el.Vernums[0]].Y);
                 maxy = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Max(el => _mesh.Points[el.Vernums[^1]].Y);
-                if(maxx-minx>maxy-miny)
-                {
-                    maxy = miny + maxx-miny;
-                }
+
                 Draw();
+
+                if (maxx - minx > maxy - miny)
+                {
+                    maxy = miny + maxx - miny;
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private void Draw()
+        {
+            var minP = _materials.Min(t => t.P.Norm);
+            var maxP = _materials.Max(t => t.P.Norm);
+            Chart.Elements.Clear();
+            var pen = new Pen(new SolidColorBrush(Colors.Black), 3);
+
+            foreach (var element in _mesh.Elements.Where(el => IsElementInProjectionPlane(el)))
+            {
+                var P = _materials[element.MaterialNumber].P.Norm;
+                var brush = new SolidColorBrush(Color.FromArgb(128, (byte)(255 * (P-minP) / (maxP - minP)), (byte)(255*(maxP-P)/(maxP-minP)), 0));
+                Chart.Elements.Add(new DrawingElement(pen, brush, new PointWrapper(_mesh[element.Vernums[0]].X, _mesh[element.Vernums[0]].Y), new PointWrapper(_mesh[element.Vernums[^1]].X, _mesh[element.Vernums[^1]].Y)));
+            }
+            Chart.InvalidateVisual();
+        }
+
+        private void CalculateDirect_Click(object sender, RoutedEventArgs e)
+        {
+            if(_mesh == null) 
+                return;
+            IDirectSolver solver = new DirectSolver(_mesh);
+            var asd = solver.Bind(_materials);
+            var P = Points.Select(p=>asd.Value(p)).ToList();
+            
+            SaveFileDialog dialog = new SaveFileDialog();
+            
+            var res= dialog.ShowDialog();
+            if ((bool)res)
+            {
+                var path = dialog.FileName;
+                using StreamWriter writer = new StreamWriter(path);
+                for (int i = 0; i < P.Count; i++)
+                {
+                    writer.WriteLine($"{Points[i].ToString()} {P[i].ToString()}");
+                }
+
+            }
+            
+        }
+
+        private void ClearMaterialsButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var material in _materials)
+            {
+                material.P = new();
+            }
+            Draw();
+        }
+
+        private void CalculateReverse_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            var res = dialog.ShowDialog();
+            if ((bool)res)
+            {
+                List<(Vector3D, Vector3D)> data = [];
+                using var sr = new StreamReader(dialog.FileName);
+                while (!sr.EndOfStream)
+                {
+                    var line = sr.ReadLine();
+                    var str = line.Split(' ');
+                    data.Add((new(double.Parse(str[0]), double.Parse(str[1]), double.Parse(str[2])), new(double.Parse(str[3]), double.Parse(str[4]), double.Parse(str[5]))));
+                }
+                IDirectSolver dirsolver = new DirectSolver(_mesh);
+                
+                IReverseSolver revSolvwer = new ReverseSolver(data, _mesh);
+
+                foreach (var item in _materials)
+                {
+                    item.P = new();
+                }
+                _materials = revSolvwer.Minimize(new LeastSquaresFunctional(data, _mesh.Elements.Count() * 3), dirsolver, _materials);
+                Draw();
             }
 
         }
@@ -122,7 +252,6 @@ namespace GUI
             {
                 projectionType = ProjectionTypeEnum.YZ;
                 coord = double.Parse(ProjYZTextBox.Text);
-                Draw();
             }
             catch (Exception ex)
             {
@@ -141,7 +270,6 @@ namespace GUI
             {
                 projectionType = ProjectionTypeEnum.XZ;
                 coord = double.Parse(ProjXZTextBox.Text);
-                Draw();
             }
             catch (Exception ex)
             {
@@ -171,42 +299,6 @@ namespace GUI
                     break;
             }
             return false;
-        }
-
-        private Path GetLocalRectangle(Element element)
-        {
-            double wcanv = Canvas.ActualWidth;
-            double hcanv = Canvas.ActualHeight;
-            double canvcoef = Math.Min(wcanv, hcanv);
-            RectangleGeometry geometry = new RectangleGeometry();
-            geometry.Rect = new Rect
-                ((_mesh[element.Vernums[0]].X - minx) / (maxx - minx) * canvcoef,
-                (_mesh[element.Vernums[0]].Y - miny) / (maxy - miny) * canvcoef,
-                (_mesh[element.Vernums[^1]].X - _mesh[element.Vernums[0]].X) / (maxx - minx) * canvcoef,
-                (_mesh[element.Vernums[^1]].Y - _mesh[element.Vernums[0]].Y) / (maxy - miny) * canvcoef);
-
-            Path path = new Path();
-            path.Fill = new SolidColorBrush(Colors.Yellow);
-            path.Stroke = new SolidColorBrush(Colors.Red);
-            path.StrokeThickness = 5;
-            path.Data = geometry;
-            return path;
-        }
-        private void Draw()
-        {
-            if (_mesh == null)
-            {
-                MessageBox.Show("Сетка не построена", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            var elements = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).ToList();
-            Canvas.Children.Clear();
-
-            foreach (var item in elements)
-            {
-                Canvas.Children.Add(GetLocalRectangle(item));
-            }
-
         }
     }
 }

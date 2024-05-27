@@ -150,8 +150,6 @@ namespace SKT.Interfaces
             int k = 0;
             var f = _solver.Bind(initialParameters);
             var value = objective.Value(f);
-            Console.WriteLine($"{initialParameters[108].P.X} {initialParameters[108].P.Y} {initialParameters[108].P.Z}");
-            Console.WriteLine($"{initialParameters[0].P.X} {initialParameters[0].P.Y} {initialParameters[0].P.Z}");
             Console.WriteLine($"iteration {k}, value {value}");
             while (value > 1e-12 && k < Maxiter)
             {
@@ -173,8 +171,6 @@ namespace SKT.Interfaces
                 k++;
                 value = objective.Value(f);
 
-                Console.WriteLine($"{initialParameters[108].P.X} {initialParameters[108].P.Y} {initialParameters[108].P.Z}");
-                Console.WriteLine($"{initialParameters[0].P.X} {initialParameters[0].P.Y} {initialParameters[0].P.Z}");
                 Console.WriteLine($"iteration {k}, value {value}");
             }
             return initialParameters;

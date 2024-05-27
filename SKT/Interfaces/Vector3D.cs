@@ -8,7 +8,13 @@ namespace SKT.Interfaces
 {
    public class Vector3D
    {
-      public Vector3D(double x, double y, double z)
+        public Vector3D()
+        {
+            X = 0;
+            Y = 0;
+            Z = 0;
+        }
+        public Vector3D(double x, double y, double z)
       {
          X = x;
          Y = y;
@@ -48,5 +54,9 @@ namespace SKT.Interfaces
       {
          return new Vector3D(vector.X / scalar, vector.Y / scalar, vector.Z / scalar);
       }
-   }
+        public override string ToString()
+        {
+            return $"{X} {Y} {Z}";
+        }
+    }
 }
