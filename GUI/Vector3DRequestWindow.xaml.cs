@@ -26,6 +26,9 @@ namespace GUI
         {
             this.vector = vector;
             InitializeComponent();
+            textBoxX.Text = vector.X.ToString();
+            textBoxY.Text = vector.Y.ToString();
+            textBoxZ.Text = vector.Z.ToString();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using SKT;
 using SKT.Interfaces;
+using SKT.Mesh;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Security.AccessControl;
@@ -49,9 +50,9 @@ namespace GUI
                     throw new NotImplementedException();
             }
             var elements = _mesh.Elements.Where(t => _mesh.IsPointInsideElement(t, vector)).ToList();
-            Vector3D P = new Vector3D();
-            if (elements.Any())
+            if (elements.Count==1)
             {
+            Vector3D P = _materials[elements[0].MaterialNumber].P;
 
                 bool result = false;
                 do
@@ -59,11 +60,6 @@ namespace GUI
                     Vector3DRequestWindow window = new Vector3DRequestWindow(ref P);
                     result = (bool)window.ShowDialog();
                 } while (result);
-            }
-
-            foreach (var item in elements)
-            {
-                _materials[item.MaterialNumber].P = P;
             }
             Draw();
 
@@ -174,7 +170,7 @@ namespace GUI
             foreach (var element in _mesh.Elements.Where(el => IsElementInProjectionPlane(el)))
             {
                 var P = _materials[element.MaterialNumber].P.Norm;
-                var brush = new SolidColorBrush(Color.FromArgb(128, (byte)(255 * (P-minP) / (maxP - minP)), (byte)(255*(maxP-P)/(maxP-minP)), 0));
+                var brush = new SolidColorBrush(Color.FromArgb(128, (byte)(255 * (P - minP) / (maxP - minP)), (byte)(255 * (maxP - P) / (maxP - minP)), 0));
                 Chart.Elements.Add(new DrawingElement(pen, brush, new PointWrapper(_mesh[element.Vernums[0]].X, _mesh[element.Vernums[0]].Y), new PointWrapper(_mesh[element.Vernums[^1]].X, _mesh[element.Vernums[^1]].Y)));
             }
             Chart.InvalidateVisual();
@@ -182,15 +178,15 @@ namespace GUI
 
         private void CalculateDirect_Click(object sender, RoutedEventArgs e)
         {
-            if(_mesh == null) 
+            if (_mesh == null)
                 return;
             IDirectSolver solver = new DirectSolver(_mesh);
             var asd = solver.Bind(_materials);
-            var P = Points.Select(p=>asd.Value(p)).ToList();
-            
+            var P = Points.Select(p => asd.Value(p)).ToList();
+
             SaveFileDialog dialog = new SaveFileDialog();
-            
-            var res= dialog.ShowDialog();
+
+            var res = dialog.ShowDialog();
             if ((bool)res)
             {
                 var path = dialog.FileName;
@@ -201,7 +197,7 @@ namespace GUI
                 }
 
             }
-            
+
         }
 
         private void ClearMaterialsButton_Click(object sender, RoutedEventArgs e)
@@ -228,8 +224,9 @@ namespace GUI
                     data.Add((new(double.Parse(str[0]), double.Parse(str[1]), double.Parse(str[2])), new(double.Parse(str[3]), double.Parse(str[4]), double.Parse(str[5]))));
                 }
                 IDirectSolver dirsolver = new DirectSolver(_mesh);
-                
+
                 IReverseSolver revSolvwer = new ReverseSolver(data, _mesh);
+                revSolvwer.AlphaRegularization = double.Parse(RegularizationParameter.Text);
 
                 foreach (var item in _materials)
                 {
@@ -239,6 +236,61 @@ namespace GUI
                 Draw();
             }
 
+        }
+
+        private void RibbonApplicationMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            bool? res = dialog.ShowDialog();
+            if ((bool)res)
+            {
+                var smesh = File.ReadAllText(dialog.FileName);
+                var mesh = System.Text.Json.JsonSerializer.Deserialize<MeshSaveModel>(smesh);
+                _mesh = mesh.Mesh;
+                _materials = mesh.Materials;
+            }
+        }
+
+        private void RibbonApplicationMenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (_mesh == null)
+                return;
+            SaveFileDialog dialog = new SaveFileDialog();
+            bool? res = dialog.ShowDialog();
+            if ((bool)res)
+            {
+                var mesh = new MeshSaveModel() { Mesh = (Mesh)_mesh, Materials = _materials };
+                var smesh = System.Text.Json.JsonSerializer.Serialize(mesh);
+                File.WriteAllText(dialog.FileName, smesh);
+            }
+        }
+
+        private void SavePointsButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            bool? res = dialog.ShowDialog();
+            if ((bool)res)
+            {
+                
+                var spoints = System.Text.Json.JsonSerializer.Serialize(Points);
+                File.WriteAllText(dialog.FileName, spoints);
+            }
+        }
+
+        private void LoadPointButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            bool? res = dialog.ShowDialog();
+            if ((bool)res)
+            {
+                var spoints = File.ReadAllText(dialog.FileName);
+                var points =  System.Text.Json.JsonSerializer.Deserialize<List<Vector3D>>(spoints);
+                Points.Clear();
+                foreach (var item in points)
+                {
+                    Points.Add(item);
+                }
+            }
         }
 
         private void ProjYZButton_Click(object sender, RoutedEventArgs e)

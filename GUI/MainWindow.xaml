@@ -11,9 +11,8 @@
             <Ribbon.ApplicationMenu>
                 <RibbonApplicationMenu>
                     <!-- Content  -->
-                    <RibbonApplicationMenuItem Header="Open" KeyTip="O"/>
-                    <RibbonApplicationMenuItem Header="Save" KeyTip="S"/>
-                    <RibbonApplicationMenuItem Header="Load" KeyTip="L"/>
+                    <RibbonApplicationMenuItem Header="Open" KeyTip="O" Click="RibbonApplicationMenuItem_Click"/>
+                    <RibbonApplicationMenuItem Header="Save" KeyTip="S" Click="RibbonApplicationMenuItem_Click_1"/>
                 </RibbonApplicationMenu>
             </Ribbon.ApplicationMenu>
         </Ribbon>
@@ -174,11 +173,15 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                             <Button x:Name="CalculateDirect" Click="CalculateDirect_Click">Выполнить расчет</Button>
+                            <Button x:Name="SavePointsButton" Click="SavePointsButton_Click">Сохранить точки измерений</Button>
+                            <Button x:Name="LoadPointButton" Click="LoadPointButton_Click">Загрузить точки измерений</Button>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Header="Настройки обратной задачи">
                         <StackPanel>
                             <Button Content="Выполнить расчет" Name="CalculateReverse" Click="CalculateReverse_Click"/>
+                            <Label>Параметр регуляризации</Label>
+                            <TextBox x:Name="RegularizationParameter">0</TextBox>
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>

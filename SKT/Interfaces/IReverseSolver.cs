@@ -11,7 +11,7 @@ namespace SKT.Interfaces
 {
     public interface IReverseSolver : IOptimizator<ILeastSquaresFunctional<Vector3D, Vector3D>, IDifferentiableFunction<Vector3D, Vector3D>, List<Material>, Vector3D, Vector3D>
     {
-
+        public double AlphaRegularization { get; set; }
     }
 
     public class LeastSquaresFunctional : ILeastSquaresFunctional<Vector3D, Vector3D>
@@ -71,6 +71,8 @@ namespace SKT.Interfaces
         /// Точки измерений
         /// </summary>
         public List<(Vector3D point, Vector3D B)> Data { get; set; }
+        public double AlphaRegularization { get ; set ; }
+
         private IDirectSolver _solver;
         private readonly IMesh _mesh;
 
@@ -157,10 +159,10 @@ namespace SKT.Interfaces
                 var mat = Jacobi.Transpose() * Jacobi;
                 var residual = objective.Residual(f);
                 var b = Jacobi.Transpose() * residual;
-                //for (int i = 0; i < mat.Count; i++)
-                //{
-                //    mat[i][i] += 1e-7;
-                //}
+                for (int i = 0; i < mat.Count; i++)
+                {
+                    mat[i][i] += AlphaRegularization;
+                }
                 var dmaterial = mat.SolveSLAE(b);
                 for (int i = 0; i < initialParameters.Count; i++)
                 {

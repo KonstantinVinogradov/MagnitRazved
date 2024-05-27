@@ -4,24 +4,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Intrinsics;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SKT.Mesh;
-internal class Mesh : IMesh
+public class Mesh : IMesh
 {
-    public IEnumerable<Element> Elements => _elements;
-    private readonly List<Element> _elements;
+    public List<Element> Elements {  get; set; }
 
-    public IReadOnlyList<Vector3D> Points => _points;
+    public List<Vector3D> Points { get; set; }
 
-    public Vector3D this[int index] => _points[index];
+    [JsonIgnore]
+    IEnumerable<Element> IMesh.Elements => Elements;
 
-    private readonly List<Vector3D> _points;
+    [JsonIgnore]
+    IReadOnlyList<Vector3D> IMesh.Points => Points;
+
+    public Vector3D this[int index] => Points[index];
 
     public Mesh(List<Element> elements, List<Vector3D> points)
     {
-        _elements = elements;
-        _points = points;
+        Elements= elements;
+        Points= points;
     }
 
     public Vector3D GetElementCenter(Element elem)
@@ -45,7 +49,7 @@ internal class Mesh : IMesh
         var v2 = Points[elem.Vernums[^1]];
         if (point.X >= v1.X && point.X <= v2.X &&
             point.Y >= v1.Y && point.Y <= v2.Y &&
-            point.Z >= v1.Z && point.Z <= v2.Z )
+            point.Z >= v1.Z && point.Z <= v2.Z)
             return true;
         return false;
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SKT.Interfaces
@@ -28,6 +29,7 @@ namespace SKT.Interfaces
       {
          return new Vector3D(Y * v.Z - Z * v.Y, v.X * Z - v.Z * X, X * v.Y - Y * v.X);
       }
+        [JsonIgnore]
       public double Norm => Math.Sqrt(this * this);
       public Vector3D Normallize() => this / Norm;
       public static Vector3D operator +(Vector3D left, Vector3D right)
