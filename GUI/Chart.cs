@@ -76,7 +76,7 @@ public class Chart : UserControl
 
     protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
     {
-        var point  = e.GetPosition(this);
+        var point = e.GetPosition(this);
         PointClicked.Invoke(this, ToGlobal(new PointWrapper(point)));
     }
     private void DrawGrid(DrawingContext drawingContext)
@@ -126,7 +126,7 @@ public class Chart : UserControl
             cur += h;
         }
         #endregion
-        DrawElements(drawingContext);
+        DrawElements(drawingContext, ToGlobal(new(ActualWidth, 0)), ToGlobal(new(0, ActualHeight)));
 
         DrawNums(x0, x1, y0, y1, h, log, drawingContext);
 
@@ -170,13 +170,17 @@ public class Chart : UserControl
         }
     }
 
-    private void DrawElements(DrawingContext drawingContext)
+    private void DrawElements(DrawingContext drawingContext, PointWrapper topRight, PointWrapper botLeft)
     {
         foreach (var element in Elements)
         {
             var topright = ToLocal(element.TopRight);
             var botleft = ToLocal(element.BotLeft);
-            drawingContext.DrawRectangle(element.Fill, element.Stroke, new Rect(topright, botleft));
+            if (element.TopRight.X > botLeft.X &&
+                element.TopRight.Y > botLeft.Y &&
+                element.BotLeft.X < topRight.X &&
+                element.BotLeft.Y < topRight.Y)
+                drawingContext.DrawRectangle(element.Fill, element.Stroke, new Rect(topright, botleft));
         }
     }
     private void DrawLine(DrawingContext drawingContext, Series series)
