@@ -160,7 +160,31 @@ namespace GUI
          {
             var P = _materials[element.MaterialNumber].P.Norm;
             var brush = new SolidColorBrush(Color.FromArgb(128, (byte)(255 * (P - minP) / (maxP - minP)), (byte)(255 * (maxP - P) / (maxP - minP)), 0));
-            Chart.Elements.Add(new DrawingElement(pen, brush, new PointWrapper(_mesh[element.Vernums[0]].X, _mesh[element.Vernums[0]].Y), new PointWrapper(_mesh[element.Vernums[^1]].X, _mesh[element.Vernums[^1]].Y)));
+                switch (projectionType)
+                {
+                    case ProjectionTypeEnum.XY:
+                        Chart.Elements.Add(
+                        new DrawingElement(pen,
+                                           brush,
+                                           new PointWrapper(_mesh[element.Vernums[0]].X, _mesh[element.Vernums[0]].Y),
+                                           new PointWrapper(_mesh[element.Vernums[^1]].X, _mesh[element.Vernums[^1]].Y)));
+                        break;
+                    case ProjectionTypeEnum.YZ:
+                        Chart.Elements.Add(
+                new DrawingElement(pen,
+                                   brush,
+                                   new PointWrapper(_mesh[element.Vernums[0]].Y, _mesh[element.Vernums[0]].Z),
+                                   new PointWrapper(_mesh[element.Vernums[^1]].Y, _mesh[element.Vernums[^1]].Z)));
+                        break;
+                    case ProjectionTypeEnum.XZ:
+                        Chart.Elements.Add(
+                new DrawingElement(pen,
+                                   brush,
+                                   new PointWrapper(_mesh[element.Vernums[0]].X, _mesh[element.Vernums[0]].Z),
+                                   new PointWrapper(_mesh[element.Vernums[^1]].X, _mesh[element.Vernums[^1]].Z)));
+                        break;
+                }
+                
          }
          Chart.InvalidateVisual();
       }
