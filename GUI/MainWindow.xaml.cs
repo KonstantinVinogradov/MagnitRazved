@@ -34,7 +34,7 @@ namespace GUI
         }
         private void PointClickedHandler(object? sender, PointWrapper e)
         {
-            Vector3D vector;
+            Vector3D vector = new() ;
             if (_mesh == null)
                 return;
             switch (projectionType)
@@ -43,11 +43,11 @@ namespace GUI
                     vector = new Vector3D(e.X, e.Y, coord);
                     break;
                 case ProjectionTypeEnum.YZ:
-                    throw new NotImplementedException();
+                    vector = new Vector3D(coord, e.X, e.Y);
+                    break;
                 case ProjectionTypeEnum.XZ:
-                    throw new NotImplementedException();
-                default:
-                    throw new NotImplementedException();
+                    vector = new Vector3D(e.X, coord, e.Y);
+                    break;
             }
             var elements = _mesh.Elements.Where(t => _mesh.IsPointInsideElement(t, vector)).ToList();
             if (elements.Count==1)
@@ -128,7 +128,6 @@ namespace GUI
             XZ
         }
 
-        double minx, maxx, miny, maxy;
 
         private void ProjXYButton_Click(object sender, RoutedEventArgs e)
         {
@@ -141,17 +140,7 @@ namespace GUI
             {
                 projectionType = ProjectionTypeEnum.XY;
                 coord = double.Parse(ProjXYTextBox.Text);
-                minx = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Min(el => _mesh.Points[el.Vernums[0]].X);
-                maxx = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Max(el => _mesh.Points[el.Vernums[^1]].X);
-                miny = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Min(el => _mesh.Points[el.Vernums[0]].Y);
-                maxy = _mesh.Elements.Where(el => IsElementInProjectionPlane(el)).Max(el => _mesh.Points[el.Vernums[^1]].Y);
-
                 Draw();
-
-                if (maxx - minx > maxy - miny)
-                {
-                    maxy = miny + maxx - miny;
-                }
             }
             catch (Exception ex)
             {
