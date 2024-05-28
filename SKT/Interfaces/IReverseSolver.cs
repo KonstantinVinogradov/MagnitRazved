@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net.WebSockets;
@@ -154,8 +155,10 @@ namespace SKT.Interfaces
             var value = objective.Value(f);
             using var sw = new StreamWriter("");
             sw.WriteLine($"iteration {k}, value {value}");
+            Stopwatch watch = new Stopwatch();
             while (value > 1e-12 && k < Maxiter)
             {
+                watch.Restart();
                 var Jacobi = objective.Jacobian(f) as Matrix;
                 var mat = Jacobi.Transpose() * Jacobi;
                 var residual = objective.Residual(f);
@@ -173,7 +176,8 @@ namespace SKT.Interfaces
                 }
                 k++;
                 value = objective.Value(f);
-                sw.WriteLine($"iteration {k}, value {value}");
+                watch.Stop();
+                sw.WriteLine($"iteration {k}, value {value}, elapsed {watch.Elapsed}");
             }
             return initialParameters;
         }
