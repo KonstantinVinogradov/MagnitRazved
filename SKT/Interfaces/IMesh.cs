@@ -12,7 +12,7 @@ namespace SKT.Interfaces
         {
             get;
         }
-        IEnumerable<Element> Elements { get; }
+        IReadOnlyList<Element> Elements { get; }
         IReadOnlyList<Vector3D> Points { get; }
         Vector3D GetElementCenter(Element elem);
         double GetElementMeasure(Element elem);
