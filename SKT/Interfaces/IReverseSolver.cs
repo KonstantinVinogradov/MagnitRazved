@@ -33,7 +33,7 @@ namespace SKT.Interfaces
 
                 for (int k = 0; k < 3; k++)
                 {
-                    var curgrad = function.Gradient(Data[i].point,k);
+                    var curgrad = function.Gradient(Data[i].point, k);
                     Parallel.For(0, _parametersCount, j =>
                     {
                         matrix[3 * i + k][j] += curgrad[j];
@@ -71,7 +71,7 @@ namespace SKT.Interfaces
         /// Точки измерений
         /// </summary>
         public List<(Vector3D point, Vector3D B)> Data { get; set; }
-        public double AlphaRegularization { get ; set ; }
+        public double AlphaRegularization { get; set; }
 
         private IDirectSolver _solver;
         private readonly IMesh _mesh;
@@ -152,7 +152,8 @@ namespace SKT.Interfaces
             int k = 0;
             var f = _solver.Bind(initialParameters);
             var value = objective.Value(f);
-            Console.WriteLine($"iteration {k}, value {value}");
+            using var sw = new StreamWriter("");
+            sw.WriteLine($"iteration {k}, value {value}");
             while (value > 1e-12 && k < Maxiter)
             {
                 var Jacobi = objective.Jacobian(f) as Matrix;
@@ -172,8 +173,7 @@ namespace SKT.Interfaces
                 }
                 k++;
                 value = objective.Value(f);
-
-                Console.WriteLine($"iteration {k}, value {value}");
+                sw.WriteLine($"iteration {k}, value {value}");
             }
             return initialParameters;
         }
