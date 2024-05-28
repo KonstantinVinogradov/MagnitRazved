@@ -152,7 +152,7 @@ namespace SKT.Interfaces
             int k = 0;
             var f = _solver.Bind(initialParameters);
             var value = objective.Value(f);
-            using var sw = new StreamWriter("");
+            using var sw = new StreamWriter("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\log.log");
             sw.WriteLine($"iteration {k}, value {value}");
             while (value > 1e-12 && k < Maxiter)
             {
