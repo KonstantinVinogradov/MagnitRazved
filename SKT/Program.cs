@@ -2,7 +2,7 @@
 using SKT.Interfaces;
 using SKT.Mesh;
 
-var rez = GeneratePoints(0, 1000, 100, 0, 1000, 100, 22);
+var rez = GeneratePoints(0, 100, 20, 0, 100, 20, 35);
 {
    var str = System.Text.Json.JsonSerializer.Serialize(rez);
    File.WriteAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\123", str);
