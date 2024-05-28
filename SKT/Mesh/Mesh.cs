@@ -15,7 +15,7 @@ public class Mesh : IMesh
     public List<Vector3D> Points { get; set; }
 
     [JsonIgnore]
-    IEnumerable<Element> IMesh.Elements => Elements;
+    IReadOnlyList<Element> IMesh.Elements => Elements;
 
     [JsonIgnore]
     IReadOnlyList<Vector3D> IMesh.Points => Points;
