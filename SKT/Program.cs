@@ -23,3 +23,4 @@ List<Vector3D> GeneratePoints(double x0,double x1,int xn,double y0 ,double y1,in
     return points;
 }
 
+

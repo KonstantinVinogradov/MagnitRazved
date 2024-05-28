@@ -12,7 +12,7 @@ namespace SKT.Interfaces
 
     public class Vector : List<double>, IVector
     {
-        public Vector() { } 
+        public Vector() { }
         public Vector(int N) : base(Enumerable.Repeat(0.0, N)) { }
         public Vector(IEnumerable<double> data) : base(data) { }
         public Vector Clone()
@@ -41,7 +41,7 @@ namespace SKT.Interfaces
         }
 
         public static double operator *(Vector vec1, Vector vec2)
-        {       
+        {
             if (vec1.Count != vec2.Count)
                 throw new Exception("Длины векторов не равны");
             double product = 0;
@@ -59,7 +59,7 @@ namespace SKT.Interfaces
         }
     }
 
-    public interface IParametricFunction<TFunction,TParameter, TInput, TOutput>where TFunction:IFunction<TInput,TOutput>
+    public interface IParametricFunction<TFunction, TParameter, TInput, TOutput> where TFunction : IFunction<TInput, TOutput>
     {
         TFunction Bind(TParameter parameters);
     }
@@ -72,7 +72,7 @@ namespace SKT.Interfaces
     public interface IDifferentiableFunction<TInput, TOutput> : IFunction<TInput, TOutput>
     {
         // По параметрам исходной IParametricFunction
-        IVector Gradient(TInput point,int i);
+        IVector Gradient(TInput point, int i);
     }
     public interface IFunctional<TFunction, TInput, TOutput> where TFunction : IFunction<TInput, TOutput>
     {
@@ -88,13 +88,13 @@ namespace SKT.Interfaces
     }
     public class Matrix : List<IList<double>>, IMatrix
     {
-        public Matrix(int n, int m):base(n)
+        public Matrix(int n, int m) : base(n)
         {
             N = n;
             M = m;
-            for (int i = 0; i < n; i++) 
+            for (int i = 0; i < n; i++)
             {
-                Add( new List<double>(Enumerable.Repeat(0.0,m)));
+                Add(new List<double>(Enumerable.Repeat(0.0, m)));
             }
         }
 
@@ -103,9 +103,12 @@ namespace SKT.Interfaces
         public static Vector operator *(Matrix matrix, IVector vector)
         {
             var product = new Vector(matrix.N);
-            for (int i = 0; i < matrix.N; i++)
-                for (int j = 0; j < matrix.M; j++)
-                    product[i] += matrix[i][ j] * vector[j];
+            Parallel.For(0, matrix.N, i =>
+                {
+                    for (int j = 0; j < matrix.M; j++)
+                        product[i] += matrix[i][j] * vector[j];
+                });
+
             return product;
         }
 
@@ -120,7 +123,7 @@ namespace SKT.Interfaces
                 {
                     for (int k = 0; k < matrix1.M; k++)
                     {
-                        res[i][ j] += matrix1[i][ k] * matrix2[k][ j];
+                        res[i][j] += matrix1[i][k] * matrix2[k][j];
                     }
                 }
             });
@@ -130,15 +133,19 @@ namespace SKT.Interfaces
         public Matrix Transpose()
         {
             var res = new Matrix(this.M, this.N);
-            for (int i = 0; i < this.M; i++)
+            Parallel.For(0, this.M, i =>
+            {
                 for (int j = 0; j < this.N; j++)
-                    res[i][ j] = this[j][ i];
+                    res[i][j] = this[j][i];
+            });
+
+
             return res;
         }
 
         public IVector SolveSLAE(IVector rightPart)
         {
-            var slae = new SLAE(this, rightPart as Vector,1e-128);
+            var slae = new SLAE(this, rightPart as Vector, 1e-128);
             return slae.LOS().solution;
         }
 
@@ -203,7 +210,7 @@ namespace SKT.Interfaces
     }
     public interface IOptimizator<TFunctional, TFunction, TParameter, TInput, TOutput> where TFunctional : IFunctional<TFunction, TInput, TOutput> where TFunction : IFunction<TInput, TOutput>
     {
-        TParameter Minimize(TFunctional objective, IParametricFunction<IDifferentiableFunction<TInput, TOutput>,TParameter, TInput, TOutput> function, TParameter initialParameters, IVector minimumParameters = default, IVector maximumParameters = default);
+        TParameter Minimize(TFunctional objective, IParametricFunction<IDifferentiableFunction<TInput, TOutput>, TParameter, TInput, TOutput> function, TParameter initialParameters, IVector minimumParameters = default, IVector maximumParameters = default);
     }
 
 }
