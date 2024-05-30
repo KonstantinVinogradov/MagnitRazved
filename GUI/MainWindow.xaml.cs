@@ -222,7 +222,7 @@ namespace GUI
          Draw();
       }
 
-      private void CalculateReverse_Click(object sender, RoutedEventArgs e)
+      private async void CalculateReverse_Click(object sender, RoutedEventArgs e)
       {
          OpenFileDialog dialog = new OpenFileDialog();
          var res = dialog.ShowDialog();
