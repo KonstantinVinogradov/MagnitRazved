@@ -147,7 +147,7 @@ namespace SKT.Interfaces
 
 
 
-        private const int Maxiter = 150;
+        private const int Maxiter = 1;
         public List<Material> Minimize(ILeastSquaresFunctional<Vector3D, Vector3D> objective, IParametricFunction<IDifferentiableFunction<Vector3D, Vector3D>, List<Material>, Vector3D, Vector3D> function, List<Material> initialParameters, IVector minimumParameters = null, IVector maximumParameters = null)
         {
             int k = 0;
@@ -155,8 +155,9 @@ namespace SKT.Interfaces
             var value = objective.Value(f);
             using var sw = new StreamWriter("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\log.log");
             sw.WriteLine($"iteration {k}, value {value}");
+            sw.Flush();
             Stopwatch watch = new Stopwatch();
-            while (value > 1e-12 && k < Maxiter)
+            while (value > 1e-7 && k < Maxiter)
             {
                 watch.Restart();
                 var Jacobi = objective.Jacobian(f) as Matrix;
@@ -178,6 +179,7 @@ namespace SKT.Interfaces
                 value = objective.Value(f);
                 watch.Stop();
                 sw.WriteLine($"iteration {k}, value {value}, elapsed {watch.Elapsed}");
+                sw.Flush();
             }
             return initialParameters;
         }
