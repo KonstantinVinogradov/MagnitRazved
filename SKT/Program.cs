@@ -5,7 +5,7 @@ using SKT.Mesh;
 var rez = GeneratePoints(0, 100, 20, 0, 100, 20, 35);
 {
     var str = System.Text.Json.JsonSerializer.Serialize(rez);
-    File.WriteAllText("C:\\Users\\sergopavlov\\Documents\\Тест Кишлак\\points", str);
+    File.WriteAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\big точки измерений.jjj", str);
 }
 int nx = 20;
 int ny = 1;
