@@ -5,26 +5,23 @@ using SKT.Mesh;
 using System.Text.Json;
 
 
-var meshtrue = JsonSerializer.Deserialize<MeshSaveModel>(File.ReadAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\smilefacetrue"));
+var meshtrue = JsonSerializer.Deserialize<MeshSaveModel>(File.ReadAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\testTetrisTrue"));
 
-var meshres= JsonSerializer.Deserialize<MeshSaveModel>(File.ReadAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\smilefaceresult"));
+var meshres= JsonSerializer.Deserialize<MeshSaveModel>(File.ReadAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\testTetrisRES_REG14"));
+
+var dstrue = new DirectSolver(meshtrue.Mesh).Bind(meshtrue.Materials);
+var dsres = new DirectSolver(meshres.Mesh).Bind(meshres.Materials);
 
 
-double z = 3.5;
-double x = 2.5;
+
+double z = 11;
+double x = 0;
 double y = 5;
-for (int i = 0; i < 20;i++)
+double xstep = 0.125;
+for (int i = 0; i < 801;i++)
 {
-   var elemres = meshres.Mesh.Elements.FirstOrDefault(t => meshres.Mesh.IsPointInsideElement(t, new(x, y, z)));
-   if(elemres != null)
-   {
-      var elemtrue = meshres.Mesh.Elements.FirstOrDefault(t => meshres.Mesh.IsPointInsideElement(t, new(x, y, z)));
-      if (elemtrue != null)
-      {
-         Console.WriteLine($"{x} {(meshres.Materials[elemres.MaterialNumber].P - meshtrue.Materials[elemtrue.MaterialNumber].P).Norm}");
-      }
-   }
-   x += 5;
+   Console.WriteLine($"{x} {(dstrue.Value(new(x, y, z))-dsres.Value(new(x,y,z))).Norm}");
+   x += xstep;
 }
 
 //var rez = GeneratePoints(0, 100, 30, 0.5, 1, 2, 35);
