@@ -5,9 +5,9 @@ using SKT.Mesh;
 using System.Text.Json;
 
 
-var meshtrue = JsonSerializer.Deserialize<MeshSaveModel>(File.ReadAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\testTetrisTrue"));
+var meshtrue = JsonSerializer.Deserialize<MeshSaveModel>(File.ReadAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\test3true"));
 
-var meshres= JsonSerializer.Deserialize<MeshSaveModel>(File.ReadAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\testTetrisRES_REG14"));
+var meshres= JsonSerializer.Deserialize<MeshSaveModel>(File.ReadAllText("C:\\Users\\Konstantin\\OneDrive\\Рабочий стол\\Новая папка\\rez3"));
 
 var dstrue = new DirectSolver(meshtrue.Mesh).Bind(meshtrue.Materials);
 var dsres = new DirectSolver(meshres.Mesh).Bind(meshres.Materials);
@@ -20,7 +20,9 @@ double y = 5;
 double xstep = 0.125;
 for (int i = 0; i < 801;i++)
 {
-   Console.WriteLine($"{x} {(dstrue.Value(new(x, y, z))-dsres.Value(new(x,y,z))).Norm}");
+   //Console.WriteLine($"{x} {(dstrue.Value(new(x, y, z))-dsres.Value(new(x,y,z))).Norm}");
+   Console.WriteLine($"{x} {(dstrue.Value(new(x, y, z))).Norm}");
+   //Console.WriteLine($"{x} {(dsres.Value(new(x, y, z))).Norm}");
    x += xstep;
 }
 
